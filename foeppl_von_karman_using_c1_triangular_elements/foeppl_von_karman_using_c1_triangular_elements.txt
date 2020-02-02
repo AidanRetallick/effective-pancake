@@ -1,0 +1,274 @@
+\mainpage Demo Problem: Pressurized, Circular Foeppl-von-Karman Plate using C1 Triangular Elements
+
+<p>
+In this example we demonstrate the use of <var>C<sup>1</sup></var> triangular (Bell) elements and 
+their curved counterpart, in the simulation of an inflated, circular plate.
+</p>
+<p>
+We use the Foeppl-von-Karman plate model: a plate model which is suitable for deformations
+involving small displacements and moderate sheet rotations. These elements
+also involve a mixture of Hermite and Lagrange interpolation, making their usage
+slightly more involved than other plate elements.
+</p>
+
+#<CENTER>
+#<TABLE> 
+#<TR>  
+#<TD>  
+<CENTER>
+<TABLE>  
+<TR> 
+<TD>  
+<CENTER>
+<B>Clamped Circular Foeppl-von Karman Plate</B>
+</CENTER> 
+Solve
+\f[
+\frac{\mbox{d}^4v_3}{\mbox{d}x_1^4} + \frac{\mbox{d}^4v_3}{\mbox{d}x_2^4}+\frac{\mbox{d}}{\mbox{d}x_\alpha}\left(S_{\alpha\beta} \frac{\mbox{d}v_3}{\mbox{d}x_\beta}\right) = \Delta P\,,
+ \ \ \ \ \ \ \ \ \ \ @E[1stFvK]@
+\f]
+and
+\f[
+\frac{\mbox{d}}{\mbox{d}x_\alpha} S_{\alpha\beta} = 0
+ \ \ \ \ \ \ \ \ \ \ @E[2nfFvK]@
+\f]
+on a circular domain \f$ x_1^2+x_2^2 \leq 1 \f$, with boundary conditions 
+\f[
+u_3(0)=\frac{\mbox{d}v_3}{\mbox{d}x_\alpha}\nu_\alpha=0 \ \mbox{\ \ \ and \ \ \ } \ \ S_{\alpha\beta}\nu_\beta=0\,, 
+\ \ \ \ \ \ \ \ \ \ @E[FvK_BC]@
+\f]
+for \f$ x_1^2+x_2^2 = 1 \f$. Here \f$ \textbs{\nu} \f$ is the outward (radial) unit normal.
+</TD>
+</TR>
+</TABLE>  
+</CENTER>
+#</TD>
+#</TR>
+#</TABLE> 
+#</CENTER>
+
+<p>
+Each element comprises a Lagrange-type interpolation basis and a curveable Bell basis.
+When initialised each Bell element is straight-sided, but can be upgraded to have
+a single curved edge. \c FoepplVonKarmanC1CurvedBellElement have 8 degrees of freedom
+at vertex nodes, 2 in-plane displacement degrees of freedom and 6 out-of-plane,
+and 2 in-plane degrees of freedom at mid-side nodes. Once upgraded they will also
+have additional internal degrees of freedom associated with the out-of-plane displacement.
+
+The basic construction is much the same as the usual order of things in a 
+problem. Underneath is the order of actions, where we highlight the new
+actions that need to be performed
+1.  Setup mesh parameters
+2.  Build the mesh
+3.  <b> Upgrade boundary elements to be curved. </b>
+4.  <b> Rotate edge degrees of freedom. </b>
+5.  Complete problem setup and set boundary conditions.
+</p>
+
+\section meshsetup Mesh Setup
+In this problem, the circular mesh is set up by specifying two semi-circular arcs
+as the input to the inline \c triangle mesh generator. This procedure follows the
+method outlined in the Triangle mesh generation tutorial so we do not discuss
+mesh construction further.
+
+After the mesh is built, but before boundary conditions are set, edge elements
+need to be upgraded to conform to the boundary, which we discuss in the next section. 
+This is a necessity in plate problems, where sufficiently continuous boundary interpolation 
+is necessary to ensure convergence to the solution of the physical problem
+
+\section upgrading Upgrading Edge Elements to be Curved
+In this problem, we have two sections of the parametric boundary which are curved:
+the top of the circle and the bottom. We use the same helper function to upgrade
+both, using simple logic to assign the correct data.
+
+Each curved element must have a parametric representation of its curved edge, which is provided by
+the \c CurvilineGeomObject class: this class represents a two-dimensional geometric
+object as a function of a single (Eulerian) coordinate: 
+\f$ \chi(s) \f$. This object must provide
+a derivative of the geometric curve as a function of the intrinsic (Eulerian) co-ordinate
+in order to provide a <var>C<sup>1</sup></var>-continuous boundary. For higher order curved elements
+a second derivative must also be provided, in order to provide a <var>C<sup>2</sup></var>-continuous
+boundary.
+
+In addition to this, the element must be given an edge to be upgraded: which can
+be specified using the enumerated type \c Edge, contained in the \c MyC1CurvedElements [to be renamed] 
+namespace and the start. Finally the start and end parametric coordinates of the curve
+section, \f$\underbar{s}\f$ and \f$\bar{s}\f$, respectively, must be provided, such that 
+\f[
+\chi(\underbar{s}) =  \boldsymbol{a_0} \quad \mathrm{and} \quad
+\chi(\bar{s}) = \boldsymbol{a_1},
+\f]
+where \f$a_0\f$ and \f$a_1\f$ are the Cartesian positions of the two nodes on the 
+boundary.
+
+We start by deducing the relevant \c CurvilineGeomObject for each boundary. This
+is easily determined using a switch statement, which can be extended as required.
+For the top of the circle, we will upgrade to the \c CurvilineGeomObject \c TestSoln::parametric_curve_top,
+and for the bottom we upgrade to \c TestSoln::parametric_curve_bottom.
+
+To upgrade each edge element on a particular boundary, \c ibound , we start by looping over
+the \c boundary_elements on boundary \c ibound . For each \c boundary_element we
+access, we need to recast the pointer to a \c FoepplVonKarmanC1CurvedBellElement
+element type, to allow access to the \c upgrade_element_to_curved(...) interface.
+
+Each element needs the \c Edge assigning, which will be enumerated by the index
+of the opposing node. This is computed by looping over all vertices, and checking
+which boundary (if any) nodes lie upon. Exactly one node per curved element
+is expected to reside within the interior (i.e. not on a boundary) of the domain.
+The positions of the vertices are also recorded, which are provided to the upgrade
+interface.
+
+\dontinclude circular_disc_uniform_pressure_foeppl_von_karman_demo.cc
+\skipline record boundary nodes
+\until end record boundary nodes
+
+Once the index of the interior node has been deduced, the start and end nodes
+of the curved edge can be deduced by cyclic permutation. For the case of a circular
+boundary, it is straightforward to provide an inverse parametric function in order
+to determine the parametric coordinate at a particular point on the edge: in general,
+however, the parametric coordinate will need to be found by a newton solve.
+
+\dontinclude circular_disc_uniform_pressure_foeppl_von_karman_demo.cc
+\skipline next (cyclic) node after interior
+\until const double s_obar
+
+Checks are then made for the cases when there is no single interior node, in which
+case the element cannot be upgraded. Similarly a check is made for inverted elements,
+which are not permitted by the curved element. 
+
+Finally the element can be upgraded using the \c Edge , \c CurvilineGeomObject
+\c vertices , and the start and end parametric coordinates, \c s_ubar and \c s_obar,
+as follows:
+ 
+\dontinclude circular_disc_uniform_pressure_foeppl_von_karman_demo.cc
+\skipline Upgrade it
+\until bulk_el_pt->upgrade_element_to_curved
+
+The full function is displayed below.
+
+\dontinclude circular_disc_uniform_pressure_foeppl_von_karman_demo.cc
+\skipline start_of_upgrade_edge_elements
+\until end_upgrade_elements
+
+\section rotating Rotating Hermite dofs on Boundary Nodes
+For Hermite elements, the default derivative degrees of freedom are axis-aligned
+to the Cartesian basis.
+However, often in physical problems the boundary conditions are expressed in terms 
+of tangential and normal derivative degrees of freedom. To permit the correct 
+expression of such boundary conditions it is necessary to introduce local rotation
+of the degrees of freedom on boundary nodes, to their tangential and normal counterparts.
+
+This is performed using the function \c set_up_rotated_dofs(...), which takes
+the boundary nodes and a function pointer as its arguments. The function pointer
+expresses the new basis, and derivatives of the new basis, as a function of the
+Cartesian basis, thus providing the elements with a Jacobian and Hessian of the 
+coordinate transform.
+
+To rotate the Hermite dofs of all boundary nodes, each bulk element must be looped over: the nodes
+of the element are then visited and checked to determine whether the node lies on an external 
+boundary. Elements with nodes found on external boundaries can then have their 
+Hermite degrees of freedom rotated to the basis of the user-provided function.
+
+The user provided function must assign two (linearly independent) basis vectors in terms
+of Cartesian coordinates as well as 
+Cartesian derivatives of the vectors. For example, in this case the normal and tangent
+to the curved boundary:
+\dontinclude circular_disc_uniform_pressure_foeppl_von_karman_demo.cc
+\skipline get_normal_and_tangent(const Vector<double>& x, Vector<double>& n,
+\until Vector<double>& t, DenseMatrix<double>& Dn, DenseMatrix<double>& Dt)
+
+Prior to rotation, the degrees of freedom will correspond to:
+\f[
+\{\; w(\boldsymbol{x}) \;,\;
+\nabla w(\boldsymbol{x}) \cdot \boldsymbol{e}_1 \;,\;
+\nabla w(\boldsymbol{x}) \cdot \boldsymbol{e}_2 \;,\;
+\nabla\nabla  w(\boldsymbol{x}) \cdot \boldsymbol{e}_1 \otimes \boldsymbol{e}_1 \;,\;
+\nabla\nabla  w(\boldsymbol{x}) \cdot \boldsymbol{e}_1 \otimes \boldsymbol{e}_2 \;,\;
+\nabla\nabla  w(\boldsymbol{x}) \cdot \boldsymbol{e}_2 \otimes \boldsymbol{e}_2 \;\}
+\f]
+where \f$\boldsymbol{e}_\alpha\f$ are the standard Cartesian basis vectors.
+After rotation to a new basis with vectors \f$\boldsymbol{n}_1\f$ and \f$\boldsymbol{n_2\f$, the degrees of freedom in the 
+element will correspond to:
+\f[
+\{\; w(\boldsymbol{x}) \;,\;
+\nabla w(\boldsymbol{x}) \cdot \boldsymbol{n}_1 \;,\;
+\nabla w(\boldsymbol{x}) \cdot \boldsymbol{n}_2 \;,\;
+\nabla\nabla  w(\boldsymbol{x}) \cdot \boldsymbol{n}_1 \otimes \boldsymbol{n}_1 \;,\;
+\nabla\nabla  w(\boldsymbol{x}) \cdot \boldsymbol{n}_1 \otimes \boldsymbol{n}_2 \;,\;
+\nabla\nabla  w(\boldsymbol{x}) \cdot \boldsymbol{n}_2 \otimes \boldsymbol{n}_2 \;\}
+\f]
+
+Such a function must be provided by the user and may, in general, vary from node 
+to node. In this case it is straightforward to define a normal and tangent for
+any point on the circular boundary. 
+
+The full code performing the rotation of Hermite degrees of freedom is shown below.
+
+\dontinclude circular_disc_uniform_pressure_foeppl_von_karman_demo.cc
+\skipline begin rotate_edge_degrees_of_freedom
+\until end rotate_edge_degrees_of_freedom
+
+\section bcs Setting Hermite Boundary Conditions in Mixed Interpolation Elements
+Finally, once the Hermite degrees of freedom have been appropriately rotated, boundary 
+conditions can be set. In Foeppl-von Karman elements, both Lagrange and Hermite
+interpolation is used, which complicates the setting of boundary conditions.
+
+To assist in setting the boundary conditions, helper functions are provided:
+\c fix_out_of_plane_displacement_dof(...) and \c fix_in_plane_displacement_dof(...).
+In this example, only out of plane displacement degrees of freedom are set,
+as the in-plane boundary conditions are stress free.
+
+As outlined in the previous section, there are six out-of-plane 
+degrees of freedom to set on each vertex node within an element. To pin an
+element along an entire edge the unknown, tangential derivative of the unknown
+and second tangential derivative must be set at both nodes lying on the boundary.
+To set the normal derivative of the unknown along an edge the normal derivative
+and cross derivative must be set. Thus for "smoothly clamped" boundary conditions
+all dofs, save for the second normal derivative, must be set to zero along
+the whole edge.
+
+For each boundary element we recast to a \c FoepplVonKarmanC1CurvedBellElement
+to access the helper. The 5 dofs that need pinning are then looped over and
+passed to the helper, along with a pointer to a function that represents the solution,
+and its derivatives, on the edge: in this a function that returns zero initialised
+vector.
+
+Finally, due to the stress free boundary condition, it is necessary to set the in-plane
+displacements at a single point in the domain, for which we choose to pin the centre.
+This is performed by the helper \c pin_in_plane_displacements_at_centre_node()
+which locates the centre node and pins the in-plane displacements. This function
+makes use of the fact that the in-plane degrees of freedom are always stored \a before
+the out-of-plane dofs, due to the fact that all nodes have in-plane displacement 
+dofs whereas only \a vertex nodes have out-of-plane displacement dofs.
+
+\section aftersetup Solving the Problem
+The remaining procedure for determining the solution follows the generic method for solving problems in \c oomph-lib
+and has no additional complications. Thus we do not detail the rest of the procedure
+here. 
+
+<HR>
+<HR>
+
+\section exercises Exercises
+-# Try changing the number of plot points to 50. Why does the solution appear to improve?
+-# Try changing the boundary conditions to fix the two in-plane displacements. 
+Why shouldn't the displacements at the centre be pinned in this case?
+
+<HR>
+<HR>
+
+
+\section sources Source files for this tutorial
+- The source files for this tutorial are located in the directory:
+<CENTER>
+<A HREF="../../../../user_drivers/animated-octo-fiesta/">
+user_drivers/animated-octo-fiesta/
+</A>
+</CENTER>
+- The driver code is: 
+<CENTER>
+<A HREF="../../../../user_drivers/animated-octo-fiesta/circular_disc_uniform_pressure_foeppl_von_karman_demo.cc">
+user_drivers/animated-octo-fiesta/circular_disc_uniform_pressure_foeppl_von_karman_demo.cc
+</A>
+</CENTER>
+.
