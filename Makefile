@@ -347,7 +347,8 @@ top_build_prefix = ../../
 top_builddir = ../..
 top_srcdir = ../..
 SUBDIRS = \
-foeppl_von_karman_using_c1_triangular_elements
+foeppl_von_karman_using_c1_triangular_elements \
+kirchhoff_plate_bending_using_bell_elements
 
 all: all-recursive
 
