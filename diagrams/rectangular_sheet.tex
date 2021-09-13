@@ -1,0 +1,43 @@
+\documentclass[crop,tikz]{standalone}
+%\usetikzlibrary{...}% tikz package already loaded by 'tikz' option
+\usetikzlibrary{calc}
+\begin{document}
+\begin{tikzpicture}
+  % Corners
+  \coordinate (a) at ( 0, 0);
+  \coordinate (b) at (15, 0);
+  \coordinate (c) at (15,10);
+  \coordinate (d) at ( 0,10);
+
+  % Midpoints 
+  \coordinate (ab) at ($(a)!0.5!(b)$);
+  \coordinate (bc) at ($(b)!0.5!(c)$);
+  \coordinate (cd) at ($(c)!0.5!(d)$);
+  \coordinate (da) at ($(d)!0.5!(a)$);
+
+  % Rectangle
+  \draw (a) -- (b); % ...
+  \draw (b) -- (c); % ...
+  \draw (c) -- (d); % ...
+  \draw (d) -- (a); % ...
+
+  % Length / Width
+  \node (Width) at ($(cd)+(0.2,0.5)$) {W};
+  \draw[blue, -|] (Width) -- ($(c)+(0,0.5)$);
+  \draw[blue, -|] (Width) -- ($(d)+(0,0.5)$);
+  \node (Length) at ($(da)-(0.5,-0.2)$) {L};
+  \draw[blue, -|] (Length) -- ($(a)+(-0.5,0)$);
+  \draw[blue, -|] (Length) -- ($(d)+(-0.5,0)$);
+
+  % Coordinate Axes
+  \draw[gray, ->] ($(a)!0.5!(b)-(0,2)$) -- ($(c)!0.5!(d)+(0,2)$);
+  \draw[gray, <-] ($(b)!0.5!(c)+(2,0)$) -- ($(d)!0.5!(a)-(2,0)$);
+
+  % Labels
+  \node (Resting) at ($(cd)-(0,0.5)$) {Resting};
+  \node[rotate=90](Free) at ($(da)+(0.5,0.0)$) {Free};
+  \node (Clamped) at ($(ab)-(0,0.5)$) {Clamped};
+  \node[rotate=90] (Sliding) at ($(bc)+(0.5,0.0)$) {Sliding};
+  
+\end{tikzpicture}
+\end{document}
