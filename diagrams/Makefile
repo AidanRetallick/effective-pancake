@@ -1,11 +1,16 @@
 PDFTOPNG = pdftoppm -png 
+PDFTOSVG = pdf2svg 
 TEX = pdflatex -shell-escape -interaction=nonstopmode -file-line-error
 
 .PHONY: all view
 
-all : rectangular_sheet.pdf rectangular_sheet.png
+all : rectangular_sheet.pdf rectangular_sheet.png rectangular_sheet.svg
 
 view :	open rectangular_sheet.pdf
+
+
+rectangular_sheet.svg : rectangular_sheet.svg
+	$(PDFTOSVG) rectangular_sheet.pdf rectangular_sheet.svg
 
 rectangular_sheet.png : rectangular_sheet.pdf
 	$(PDFTOPNG) rectangular_sheet.pdf out

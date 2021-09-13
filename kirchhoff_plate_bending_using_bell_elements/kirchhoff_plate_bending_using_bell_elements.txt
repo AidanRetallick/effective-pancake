@@ -51,7 +51,9 @@ where \f$\nu\f$ is the Poisson ratio,\f$\boldsymbol{M}\f$ is the bending moment 
 resting, free, sliding and clamped edge respectively.
 
 This boundary condition configuration is shown in the diagram below.
-\image html rectanglediagram.svg "Sketch of the boundary conditions."
+# \image html rectanglediagram.svg "Sketch of the boundary conditions."
+# \image html rectangular_sheet.png "Sketch of the boundary conditions." width=50%
+\image html rectangular_sheet.svg "Sketch of the boundary conditions." width=60%
 
 We may nondimensionalize the equations by introducing nondimensional horizontal coordinates \f$x_\alpha = x^*_\alpha / W, \alpha\in\{1,2\} \f$, nondimensional vertical displacement \f$x_3 = x^2_3 / h \f$ and nondimensional pressure \f$P = P^* W^4 / B h\f$. Here \f$h\f$ is the thickness of the sheet.
 This yeilds
