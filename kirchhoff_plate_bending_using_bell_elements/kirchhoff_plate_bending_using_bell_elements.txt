@@ -1,4 +1,4 @@
-\mainpage Demo Problem: Small Displacements of a Rectangular Plate using C1 Triangular Elements
+\mainpage Demo Problem: Small Amplitude Bending of a Rectangular Plate using C1 Triangular Elements
 
 <p>
 In this example we demonstrate the use of <var>C<sup>1</sup></var> triangular (Bell) elements,
@@ -15,7 +15,7 @@ involving small sheet rotations.
 #<TR>  
 #<TD>  
 <CENTER>
-<TABLE>  
+<TABLE> 
 <TR> 
 <TD>  
 <CENTER>
@@ -23,35 +23,57 @@ involving small sheet rotations.
 </CENTER> 
 Solve
 \f[
-\frac{\partial^4v_3}{\partial x_1^4} + \frac{\partial^4v_3}{\partial x_2^4} = \Delta P\,,
+B\left[\frac{\partial^4v^*_3}{\partial x^*_1^4} + \frac{\partial^4v^*_3}{\partial x^*_2^4}\right] = P^*\,,
  \ \ \ \ \ \ \ \ \ \ @E[Biharmonic]@
 \f]
-with vertical displacement \f$v_3\f$ and  pressure \f$\Delta P\f$, on a rectangular domain
-of aspect ratio \f$L\f$:
+with vertical displacement \f$v^*_3\f$ and  pressure \f$P^*\f$, on a rectangular domain
+of aspect ratio \f$L/W\f$:
 \f[
--1/2\leq x_1 \leq 1/2,\,\,   -L/2\leq x_2 \leq L/2\,\,.
+-W/2\leq x^*_1 \leq W^*/2,\,\,   -L/2\leq x^*_2 \leq L/2\,\,.
 \f]
+Here \f$B\f$ is the bending moment.
 
-We consider the case where we have the four edges, traversing clockwise, with resting (pinned
-to zero and normal moment free), 
-sliding (zero angle, but free to move transversely),
-clamped (smoothly pinned to zero) and  
-free (normal moment and normal shear free)
+We consider the case where the four edges are subject to different boundary conditions with resting <!-- (pinned to zero and normal moment free) -->
+, sliding <!-- (zero angle, but free to move transversely) -->
+, clamped <!-- (smoothly pinned to zero) -->
+and  free <!-- (normal moment and normal shear free) -->
 boundary conditions, respectively.
+
 The boundary conditions are then as follows 
 # cite Timoshenko
 \f{eqnarray*}{
-v_3(x_2=+L/2) = 0&,\quad & \left(\frac{\partial^2 v_3}{\partial x_2^2} + \nu \frac{\partial^2 v_3}{\partial x_1^2}\right)|_{x_2 = L/2} = 0\\
-\left(\frac{\partial^3 v_3}{\partial x_1^3} + (2-\nu) \frac{\partial^3 v_3}{\partial x_1\partial x_2^2}\right)|_{x_1 = 1/2} = 0 &,\quad & \frac{\partial v_3}{\partial x_1}|_{x_1 = 1/2} = 0\\
-v_3(x_2=-L/2) = 0&,\quad & \frac{\partial v_3}{\partial x_2}|_{x_2= -L/2} =0 \\
-\left(\frac{\partial^3 v_3}{\partial x_1^3} + (2-\nu) \frac{\partial^3 v_3}{\partial x_1\partial x_2^2}\right)|_{x_1 =-1/2} = 0 &,\quad & \left(\frac{\partial^2 v_3}{\partial x_1^2} + \nu \frac{\partial^2 v_3}{\partial x_2^2}\right)|_{x_1 =-1/2} = 0
+v^*_3(x^*_2=+L/2) = 0&,\quad & M_2 = B\left(\frac{\partial^2 v^*_3}{\partial x^*_2^2} + \nu \frac{\partial^2 v^*_3}{\partial x^*_1^2}\right)|_{x^*_2 = L/2} = 0,\qquad \text{(resting)}\\
+V_1 = B\left(\frac{\partial^3 v^*_3}{\partial x^*_1^3} + (2-\nu) \frac{\partial^3 v^*_3}{\partial x^*_1\partial x^*_2^2}\right)|_{x^*_1 = W/2} = 0 &,\quad & \frac{\partial v^*_3}{\partial x^*_1}|_{x^*_1 = W/2} = 0, \qquad\qquad\qquad\qquad \text{(sliding)}\\
+v^*_3(x^*_2=-L/2) = 0&,\quad & \frac{\partial v^*_3}{\partial x^*_2}|_{x^*_2= -L/2} =0,\qquad\qquad\qquad\quad \text{(clamped)} \\
+V_2 = B\left(\frac{\partial^3 v^*_3}{\partial x_1^3} + (2-\nu) \frac{\partial^3 v^*_3}{\partial x_1\partial x_2^2}\right)|_{x_1 =-W/2} = 0 &,\quad & M_2 = B\left(\frac{\partial^2 v^*_3}{\partial x_1^2} + \nu \frac{\partial^2 v^*_3}{\partial x_2^2}\right)|_{x_1 =-W/2} = 0,\qquad \text{(free)}
 \f}
-where \f$\nu\f$ is the Poisson ratio. These conditions correspond to 
+where \f$\nu\f$ is the Poisson ratio,\f$\boldsymbol{M}\f$ is the bending moment and \f$\boldsymbol{V}\f$ is the Kirchhoff shear force. These conditions correspond to 
 resting, free, sliding and clamped edge respectively.
 
 This boundary condition configuration is shown in the diagram below.
 \image html rectanglediagram.svg "Sketch of the boundary conditions."
 
+We may nondimensionalize the equations by introducing nondimensional horizontal coordinates \f$x_\alpha = x^*_\alpha / W, \alpha\in\{1,2\} \f$, nondimensional vertical displacement \f$x_3 = x^2_3 / h \f$ and nondimensional pressure \f$P = P^* W^4 / B h\f$. Here \f$h\f$ is the thickness of the sheet.
+This yeilds
+\f[
+\frac{\partial^4v_3}{\partial x_1^4} + \frac{\partial^4v_3}{\partial x_2^4} = P\,,
+ \ \ \ \ \ \ \ \ \ \ @E[Biharmonic]@
+\f]
+with vertical displacement \f$v_3\f$ and  pressure \f$P\f$, on a rectangular domain
+of aspect ratio \f$l=L/W\f$:
+\f[
+-1/2\leq x_1 \leq 1/2,\,\,   -l/2\leq x_2 \leq l/2\,\,.
+\f]
+
+The boundary conditions are then 
+# cite Timoshenko
+\f{eqnarray*}{
+v_3(x_2=+l/2) = 0&,\quad & \left(\frac{\partial^2 v_3}{\partial x_2^2} + \nu \frac{\partial^2 v_3}{\partial x_1^2}\right)|_{x_2 = l/2} = 0,\qquad \text{(resting)}\\
+\left(\frac{\partial^3 v_3}{\partial x_1^3} + (2-\nu) \frac{\partial^3 v_3}{\partial x_1\partial x_2^2}\right)|_{x_1 = 1/2} = 0 &,\quad & \frac{\partial v_3}{\partial x_1}|_{x_1 = 1/2} = 0, \qquad\qquad\qquad\qquad \text{(sliding)}\\
+v_3(x_2=-l/2) = 0&,\quad & \frac{\partial v_3}{\partial x_2}|_{x_2= -l/2} =0,\qquad\qquad\qquad\quad \text{(clamped)} \\
+\left(\frac{\partial^3 v_3}{\partial x_1^3} + (2-\nu) \frac{\partial^3 v_3}{\partial x_1\partial x_2^2}\right)|_{x_1 =-1/2} = 0 &,\quad & \left(\frac{\partial^2 v_3}{\partial x_1^2} + \nu \frac{\partial^2 v_3}{\partial x_2^2}\right)|_{x_1 =-1/2} = 0,\qquad \text{(free)}
+\f}
+where \f$\nu\f$ is the Poisson ratio.
 </TD>
 </TR>
 </TABLE>  
@@ -183,7 +205,7 @@ To finish the set-up of the problem, element parameters and boundary
 conditions must be set. In this problem, we may set the Poisson
 ratio and the pressure in the bulk. To do this we loop over all elements in the bulk
 mesh and recast the elements as the templated `ELEMENT` type. This allows
-us to "duck type" and call an element with helper functions `nu_pt()` and
+us to <a href=https://en.wikipedia.org/wiki/Duck_typing>"duck type"</a> and call an element with helper functions `nu_pt()` and
 `pressure_fct_pt()` in order to set the physical parameters for
 the `KirchhoffPlateBendingC1CurvedBellElement`. Once these parameters are set,
 we may set the boundary conditions by calling the helper `apply_boundary_conditions()`.
