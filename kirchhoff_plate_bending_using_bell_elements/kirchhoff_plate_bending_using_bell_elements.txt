@@ -55,8 +55,8 @@ This boundary condition configuration is shown in the diagram below.
 # \image html rectangular_sheet.png "Sketch of the boundary conditions." width=50%
 \image html rectangular_sheet.svg "Sketch of the boundary conditions." width=60%
 
-We may nondimensionalize the equations by introducing nondimensional horizontal coordinates \f$x_\alpha = x^*_\alpha / W, \alpha\in\{1,2\} \f$, nondimensional vertical displacement \f$x_3 = x^2_3 / h \f$ and nondimensional pressure \f$P = P^* W^4 / B h\f$. Here \f$h\f$ is the thickness of the sheet.
-This yeilds
+We may non-dimensionalise the equations by introducing non-dimensional horizontal coordinates \f$x_\alpha = x^*_\alpha / W, \alpha\in\{1,2\} \f$, non-dimensional vertical displacement \f$x_3 = x^2_3 / h \f$ and non-dimensional pressure \f$P = P^* W^4 / B h\f$. Here \f$h\f$ is the thickness of the sheet.
+This yields
 \f[
 \frac{\partial^4v_3}{\partial x_1^4} + \frac{\partial^4v_3}{\partial x_2^4} = P\,,
  \ \ \ \ \ \ \ \ \ \ @E[Biharmonic]@
