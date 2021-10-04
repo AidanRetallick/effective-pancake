@@ -7,7 +7,7 @@ in the simulation of an rectangular plate subject to transverse pressure.
 <p>
 We solve an elastic plate problem using linear Kirchoff-Love
 plate elements. This model is suitable for plates undergoing deformations
-involving small sheet rotations. 
+involving small plate rotations. 
 </p>
 
 #<CENTER>
@@ -55,7 +55,7 @@ This boundary condition configuration is shown in the diagram below.
 # \image html rectangular_sheet.png "Sketch of the boundary conditions." width=50%
 \image html rectangular_sheet.svg "Sketch of the boundary conditions." width=60%
 
-We may non-dimensionalise the equations by introducing non-dimensional horizontal coordinates \f$x_\alpha = x^*_\alpha / W, \alpha\in\{1,2\} \f$, non-dimensional vertical displacement \f$x_3 = x^2_3 / h \f$ and non-dimensional pressure \f$P = P^* W^4 / B h\f$. Here \f$h\f$ is the thickness of the sheet.
+We may non-dimensionalise the equations by introducing non-dimensional horizontal coordinates \f$x_\alpha = x^*_\alpha / W, \alpha\in\{1,2\} \f$, non-dimensional vertical displacement \f$x_3 = x^2_3 / h \f$ and non-dimensional pressure \f$P = P^* W^4 / B h\f$. Here \f$h\f$ is the thickness of the plate.
 This yields
 \f[
 \frac{\partial^4v_3}{\partial x_1^4} + \frac{\partial^4v_3}{\partial x_2^4} = P\,,
@@ -99,16 +99,6 @@ at each vertex node, which correspond to the following enumerated Hermite degree
 \mathrm{dof\; 5}: \quad &\frac{\partial^2 w}{\partial x_2^2} \,. 
 \f}
 
-The basic construction is much the same as the usual order of actions in a 
-problem.
-1.  Setup mesh parameters.
-2.  Build the mesh.
-3.  Complete problem setup and set boundary conditions.
-
-Unlike in other plate model problems, because the plate is rectangular and axis aligned,
-no rotation of the Hermite degrees of freedom is necessary to impose boundary conditions,
-as the degrees of freedom are already expressed in terms of normal and tangent
-derivatives on the boundaries.
 </p>
 
 \section globalparams Global Parameters and Functions
@@ -118,17 +108,15 @@ the Poisson ratio and the (constant) pressure. We also include a boolean
 flag for high resolution output.
 
 \dontinclude rectangular_sheet_kirchhoff_plate_bending_demo.cc
-\skipline /// Nondim length of strip
-\until bool High_resolution
-
-We also define helpers to aid in setting the boundary conditions and the pressure,
-which is in general a function of the spatial coordinate. This pressure function
-is used to set a (potentially)
-spatially varying pressure applied to the sheet.
-
-\dontinclude rectangular_sheet_kirchhoff_plate_bending_demo.cc
-\skipline bool is_boundary_held_at_zero_slope
+\skipline namespace TestSoln
 \until } // end of TestSoln 
+
+We also define helper functions to define the boundary conditions and the pressure load,
+which is in general a function of the spatial coordinate.
+
+# \dontinclude rectangular_sheet_kirchhoff_plate_bending_demo.cc
+# \skipline bool is_boundary_held_at_zero_slope
+# \until } // end of TestSoln 
 
 \section driver The Driver Code
 The driver code for this example is very simple. We start by setting up the command
@@ -246,7 +234,7 @@ which is called as the last step in the constructor.
 \until // end_constructor
 
 Now that the complete physical problem can be constructed, we may Newton solve
-the problem to determine the displacement of the rectangular sheet, subject to a
+the problem to determine the displacement of the rectangular plate, subject to a
 uniform pressure and the applied boundary conditions.
 
 \section exercises Exercises
