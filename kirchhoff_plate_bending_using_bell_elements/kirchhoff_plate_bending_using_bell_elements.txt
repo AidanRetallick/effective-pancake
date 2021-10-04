@@ -129,8 +129,8 @@ and the resolution of the solution.
 \until CommandLineArgs::doc_specified_flags()
 
 Once the necessary set-up has been performed we create an instance of the problem
-class. As the problem is linear, we set the max Newton iterations to be one.
-To solve the problem, we perform a Newton solve and then document the solution.
+class. 
+To solve the problem, we solve the linear equation and then document the solution.
 
 \dontinclude rectangular_sheet_kirchhoff_plate_bending_demo.cc
 \skipline Create Problem instance
