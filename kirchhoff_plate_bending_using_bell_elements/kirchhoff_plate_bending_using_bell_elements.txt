@@ -51,8 +51,6 @@ where \f$\nu\f$ is the Poisson ratio,\f$\mathbf{M}\f$ is the bending moment and 
 resting, free, sliding and clamped edge respectively.
 
 This boundary condition configuration is shown in the diagram below.
-# \image html rectanglediagram.svg "Sketch of the boundary conditions."
-# \image html rectangular_sheet.png "Sketch of the boundary conditions." width=50%
 \image html rectangular_sheet.svg "Sketch of the boundary conditions." width=60%
 
 We may non-dimensionalise the equations by introducing non-dimensional horizontal coordinates \f$x_\alpha = x^*_\alpha / W, \alpha\in\{1,2\} \f$, non-dimensional vertical displacement \f$x_3 = x^2_3 / h \f$ and non-dimensional pressure \f$P = P^* W^4 / B h\f$. Here \f$h\f$ is the thickness of the plate.
@@ -84,6 +82,14 @@ where \f$\nu\f$ is the Poisson ratio.
 #</TR>
 #</TABLE> 
 #</CENTER>
+
+\latexonly
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{../../figures/rectangular_sheet.png}
+\caption{Sketch of the boundary conditions}
+\end{figure}
+\endlatexonly
 
 <p>
 
@@ -195,26 +201,27 @@ we may set the boundary conditions by calling the helper `apply_boundary_conditi
 \until end_of_complete
 
 \section bcs Setting Hermite Boundary Conditions
-To apply the boundary conditions, we loop over the boundaries of the shees.
+To apply the boundary conditions, we loop over the boundaries of the sheet.
 We then loop over each boundary node lying on the ith boundary.
 
 For each node we first check if it is on a pinned boundary, using the helper function
 defined in the `TestSoln` namespace. If so, we pin the zeroth derivative, first tangential
 derivative and second tangential derivative degrees of freedom to zero.
-We do this because the trace of the Bell element corresponds to a fifth order 1D polynomial:
+We do this because the function along the edge of each Bell element corresponds to a fifth order 1D polynomial:
 thus to constrain the whole side of the element to zero, all of the 1D polynomial
 degrees of freedom must be fixed to zero: i.e. the tangent derivatives and value
 degrees of freedom.
-For odd boundaries, these correspond to the zeroth (\f$v_3\f$), first (\f$\partial v_3 / \partial x_1\f$) and third degrees (\f$\partial^2 v_3 / \partial x_1^2\f$) of freedom. For even these correspond to the zeroth (\f$v_3\f$), second (\f$\partial v_3 / \partial x_2\f$) and fifth
+For an \f$x_1\f$-axis aligned boundary, these correspond to the zeroth (\f$v_3\f$), first (\f$\partial v_3 / \partial x_1\f$) and third degrees (\f$\partial^2 v_3 / \partial x_1^2\f$) of freedom.
+For \f$x_2\f$-axis aligned boundary these correspond to the zeroth (\f$v_3\f$), second (\f$\partial v_3 / \partial x_2\f$) and fifth
 degrees of freedom (\f$\partial^2 v_3 / \partial x_2^2\f$).
 
-The Bell element has a third-order polynomial for the trace of the normal derivative.
-For angle-constrained boundaries, we may set the normal derivative and
+For the Bell element, the normal derivative along each edge of the element is a third-order polynomial.
+For slope-constrained boundaries, we may set the normal derivative and
 the cross derivative at the nodes, in order to prescribe the angle along the whole edge.
-Thus for odd boundaries we set the second (\f$\partial v_3 / \partial x_2\f$) and fourth (\f$\partial^2 v_3 / \partial x_1\partial x_2\f$) degrees of freedom
-and for even boundaries we set the first (\f$\partial v_3 / \partial x_1\f$) and fourth (\f$\partial^2 v_3 / \partial x_1\partial x_2\f$) degrees of freedom
-to zero, in order to prescribe zero slope. The second normal derivative is not
-known a priori and is never set as a boundary condition.
+Thus for \f$x_1\f$-aligned boundaries we set the second (\f$\partial v_3 / \partial x_2\f$) and fourth (\f$\partial^2 v_3 / \partial x_1\partial x_2\f$) degrees of freedom
+and for \f$x_2\f$-aligned boundaries we set the first (\f$\partial v_3 / \partial x_1\f$) and fourth (\f$\partial^2 v_3 / \partial x_1\partial x_2\f$) degrees of freedom
+to zero, in order to prescribe zero slope. The second normal derivative is never
+known a priori and is never pinned to set the boundary conditions.
 
 \dontinclude rectangular_sheet_kirchhoff_plate_bending_demo.cc
 \skipline start_of_apply_bc
@@ -239,9 +246,7 @@ uniform pressure and the applied boundary conditions.
 
 \section exercises Exercises
 -# Try changing the number of plot points to 50. Why does the solution appear to improve?
--# Try setting the boundary conditions to prescribe a function along the whole
-edge. Can you impose a manufactured solution?
-
+-# Try imposing boundary conditions such that the solution \f$w = x_1^2 x_2^2 \f$ holds throughout the domain. What pressure is needed to impose this manufactured solution?
 <HR>
 <HR>
 

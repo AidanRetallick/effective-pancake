@@ -1,4 +1,5 @@
 SUBDIRS = \
+figures \
 foeppl_von_karman_using_c1_triangular_elements \
 kirchhoff_plate_bending_using_bell_elements \
-diagrams
+rectangular_plate_bending_using_rotated_bell_elements
