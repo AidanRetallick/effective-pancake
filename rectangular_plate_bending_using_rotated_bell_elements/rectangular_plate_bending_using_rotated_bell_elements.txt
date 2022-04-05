@@ -1,0 +1,304 @@
+\mainpage Demo Problem: Small Amplitude Bending of a Rectangular Plate using Rotated C1 Triangular Elements
+
+<p>
+In this example we revisit the use of <var>C<sup>1</sup></var> triangular (Bell) elements,
+in the simulation of an rectangular plate subject to transverse pressure. This time however, we use rotated
+boundary degrees of freedom, to impose boundary conditions in terms of normal and tangent degrees of freedom.
+</p>
+<p>
+We solve an elastic plate problem using linear Kirchoff-Love
+plate elements. This model is suitable for plates undergoing deformations
+involving small plate rotations. 
+</p>
+
+#<CENTER>
+#<TABLE> 
+#<TR>  
+#<TD>  
+<CENTER>
+<TABLE> 
+<TR> 
+<TD>  
+<CENTER>
+<B>Clamped Rectangular, Linear Kirchoff-Love Plate</B>
+</CENTER> 
+Solve
+\f[
+B\left[\frac{\partial^4v^*_3}{\partial {x^*_1}^4} + \frac{\partial^4v^*_3}{\partial {x^*_2}^4}\right] = P^*\,,
+ \ \ \ \ \ \ \ \ \ \ @E[Biharmonic]@
+\f]
+with vertical displacement \f$v^*_3\f$ and  pressure \f$P^*\f$, on a rectangular domain
+of aspect ratio \f$L/W\f$:
+\f[
+-W/2\leq x^*_1 \leq W^*/2,\,\,   -L/2\leq x^*_2 \leq L/2\,\,.
+\f]
+Here \f$B\f$ is the bending moment.
+
+We consider the case where the four edges are subject to different boundary conditions with resting <!-- (pinned to zero and normal moment free) -->
+, sliding <!-- (zero angle, but free to move transversely) -->
+, clamped <!-- (smoothly pinned to zero) -->
+and  free <!-- (normal moment and normal shear free) -->
+boundary conditions, respectively.
+
+The boundary conditions are then as follows 
+# cite Timoshenko
+\f{eqnarray*}{
+v^*_3(x^*_2=+L/2) = 0&,\quad & M_2 = B\left(\frac{\partial^2 v^*_3}{\partial {x^*_2}^2} + \nu \frac{\partial^2 v^*_3}{\partial {x^*_1}^2}\right)|_{x^*_2 = L/2} = 0,\qquad \mbox{(resting)}\\
+V_1 = B\left(\frac{\partial^3 v^*_3}{\partial {x^*_1}^3} + (2-\nu) \frac{\partial^3 v^*_3}{\partial x^*_1\partial {x^*_2}^2}\right)|_{x^*_1 = W/2} = 0 &,\quad & \frac{\partial v^*_3}{\partial x^*_1}|_{x^*_1 = W/2} = 0, \qquad\qquad\qquad\qquad \mbox{(sliding)}\\
+v^*_3(x^*_2=-L/2) = 0&,\quad & \frac{\partial v^*_3}{\partial x^*_2}|_{x^*_2= -L/2} =0,\qquad\qquad\qquad\quad \mbox{(clamped)} \\
+V_2 = B\left(\frac{\partial^3 v^*_3}{\partial {x^*_1}^3} + (2-\nu) \frac{\partial^3 v^*_3}{\partial x^*_1\partial {x^*_2}^2}\right)|_{x_1 =-W/2} = 0 &,\quad & M_2 = B\left(\frac{\partial^2 v^*_3}{\partial {x^*_1}^2} + \nu \frac{\partial^2 v^*_3}{\partial {x^*_2}^2}\right)|_{x_1 =-W/2} = 0,\qquad \mbox{(free)}
+\f}
+where \f$\nu\f$ is the Poisson ratio,\f$\mathbf{M}\f$ is the bending moment and \f$\mathbf{V}\f$ is the Kirchhoff shear force. These conditions correspond to 
+resting, free, sliding and clamped edge respectively.
+
+This boundary condition configuration is shown in the diagram below.
+\image html rectangular_sheet.svg "Sketch of the boundary conditions." width=60%
+
+We may non-dimensionalise the equations by introducing non-dimensional horizontal coordinates \f$x_\alpha = x^*_\alpha / W, \alpha\in\{1,2\} \f$, non-dimensional vertical displacement \f$x_3 = x^2_3 / h \f$ and non-dimensional pressure \f$P = P^* W^4 / B h\f$. Here \f$h\f$ is the thickness of the plate.
+This yields
+\f[
+\frac{\partial^4v_3}{\partial x_1^4} + \frac{\partial^4v_3}{\partial x_2^4} = P\,,
+ \ \ \ \ \ \ \ \ \ \ @E[NonDimBiharmonic]@
+\f]
+with vertical displacement \f$v_3\f$ and  pressure \f$P\f$, on a rectangular domain
+of aspect ratio \f$l=L/W\f$:
+\f[
+-1/2\leq x_1 \leq 1/2,\,\,   -l/2\leq x_2 \leq l/2\,\,.
+\f]
+
+The boundary conditions are then 
+# cite Timoshenko
+\f{eqnarray*}{
+v_3(x_2=+l/2) = 0&,\quad & \left(\frac{\partial^2 v_3}{\partial x_2^2} + \nu \frac{\partial^2 v_3}{\partial x_1^2}\right)|_{x_2 = l/2} = 0,\qquad \mbox{(resting)}\\
+\left(\frac{\partial^3 v_3}{\partial x_1^3} + (2-\nu) \frac{\partial^3 v_3}{\partial x_1\partial x_2^2}\right)|_{x_1 = 1/2} = 0 &,\quad & \frac{\partial v_3}{\partial x_1}|_{x_1 = 1/2} = 0, \qquad\qquad\qquad\qquad \mbox{(sliding)}\\
+v_3(x_2=-l/2) = 0&,\quad & \frac{\partial v_3}{\partial x_2}|_{x_2= -l/2} =0,\qquad\qquad\qquad\quad \mbox{(clamped)} \\
+\left(\frac{\partial^3 v_3}{\partial x_1^3} + (2-\nu) \frac{\partial^3 v_3}{\partial x_1\partial x_2^2}\right)|_{x_1 =-1/2} = 0 &,\quad & \left(\frac{\partial^2 v_3}{\partial x_1^2} + \nu \frac{\partial^2 v_3}{\partial x_2^2}\right)|_{x_1 =-1/2} = 0,\qquad \mbox{(free)}
+\f}
+where \f$\nu\f$ is the Poisson ratio.
+</TD>
+</TR>
+</TABLE>  
+</CENTER>
+#</TD>
+#</TR>
+#</TABLE> 
+#</CENTER>
+
+\latexonly
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{../../figures/rectangular_sheet.png}
+\caption{Sketch of the boundary conditions}
+\end{figure}
+\endlatexonly
+
+<p>
+
+The vertical displacement, \f$v_3\f$ is discretised  using Bell-basic functions which introduce 18 Hermite degrees-of freedom per element.
+`KirchhoffPlateBendingC1CurvedBellElement` have 6 degrees of freedom
+at each vertex node, which correspond to the following enumerated Hermite degrees of freedom:
+\f{eqnarray*}{
+\mathrm{dof\; 0}: \quad & w \\
+\mathrm{dof\; 1}: \quad & \frac{\partial w}{\partial x_1} \\
+\mathrm{dof\; 2}: \quad &\frac{\partial w}{\partial x_2}  \\
+\mathrm{dof\; 3}: \quad &\frac{\partial^2 w}{\partial x_1^2}  \\
+\mathrm{dof\; 4}: \quad &\frac{\partial^2 w}{\partial x_1 \partial x_2}  \\
+\mathrm{dof\; 5}: \quad &\frac{\partial^2 w}{\partial x_2^2} \,. 
+\f}
+
+On boundaries we set-up rotated degrees of freedom that correspond to:
+\f{eqnarray*}{
+\mathrm{dof\; 0}: \quad & w \\
+\mathrm{dof\; 1}: \quad & \frac{\partial w}{\partial \xi_1} \\
+\mathrm{dof\; 2}: \quad &\frac{\partial w}{\partial \xi_2}  \\
+\mathrm{dof\; 3}: \quad &\frac{\partial^2 w}{\partial \xi_1^2}  \\
+\mathrm{dof\; 4}: \quad &\frac{\partial^2 w}{\partial \xi_1 \partial \xi_2}  \\
+\mathrm{dof\; 5}: \quad &\frac{\partial^2 w}{\partial \xi_2^2} \,. 
+\f}
+where \f$\xi_1\f$ and \f$\xi_2\f$ are the rotated co-ordinates. These will be aligned with the normal and tangent on each edge, so for example on the
+edge $x_2=-1/2$ we have:
+\f{eqnarray*}{
+& \xi_1 =-x_2 \\
+& \xi_2 =-x_1 \,. 
+\f}
+Computing the Jacobian and Hessian for this side we have:
+\f[
+\textbf{J} = \left( 
+\matrix{
+0 & -1 \cr
+-1 & 0 \cr} \right)
+\f]
+with element \f$J_{\alpha\beta}} = \partial \xi_\alpha / \partial x_\beta \f$ and \f$H_{\alpha\beta\gamma} = \partial^2 \xi_\alpha / \partial x_\beta  \partial x_\gamma = 0 \f$.
+
+
+
+</p>
+
+\section globalparams Global Parameters and Functions
+We define physical parameters and functions in a global namespace at the top of
+the driver code: for this problem the parameters are the length of the strip,
+the Poisson ratio and the (constant) pressure. We also include a boolean 
+flag for high resolution output.
+
+We also include a (discontinuous) function that defines the normal and tangent directions to the sheet.
+The prototype for this function must accept a position vector (by const reference), two vectors
+to contain the normal and tangent and two matrices to hold the derivative with respect to position of the
+normal and tangent, respectively. Using these quantities, the elements are able to compute the Jacobian
+and Hessian in order to transform to the rotated basis.
+
+For a rectilinear sheet, the normal and tangent do not vary along the boundaries, so these two matrices have
+no non-zero elements. The normal and tangent, however are discontinuous and differ on the various sides of the rectangle.
+To take this into account the position vector is used to distinguish the normal and tangent on each boundary.
+# TODO say something about how this corresponds to dofs.
+
+\dontinclude rectangular_sheet_kirchhoff_plate_bending_rotation_demo.cc
+\skipline namespace TestSoln
+\until } // end of TestSoln 
+
+We also define helper functions to define the boundary conditions and the pressure load,
+which is in general a function of the spatial coordinate.
+
+# \dontinclude rectangular_sheet_kirchhoff_plate_bending_rotation_demo.cc
+# \skipline bool is_boundary_held_at_zero_slope
+# \until } // end of TestSoln 
+
+\section driver The Driver Code
+The driver code for this example is very simple. We start by setting up the command
+line arguments of the example, which are used to set the physical constants
+held in the global namespace, as well as output parameters such as the output directory
+and the resolution of the solution.
+
+\dontinclude rectangular_sheet_kirchhoff_plate_bending_rotation_demo.cc
+\skipline start_of_main
+\until CommandLineArgs::doc_specified_flags()
+
+Once the necessary set-up has been performed we create an instance of the problem
+class. 
+To solve the problem, we solve the linear equation and then document the solution.
+
+\dontinclude rectangular_sheet_kirchhoff_plate_bending_rotation_demo.cc
+\skipline Create Problem instance
+\until End of main 
+
+\section meshsetup Setup and Build the Mesh
+In the constructor of the problem, we prepare the problem to be solved so it becomes
+a complete, useable problem instance. We start by creating the mesh.
+
+To set-up the mesh, we use the helper function `set_up_rectangular_mesh`. This
+function is called to initialize the `Triangle_mesh_parameters_pt` member, before
+creating the mesh.
+
+We formulate the problem in Cartesian coordinates, setting up a rectangular domain
+from the  composition of several straight lines. First we define the co-ordinates
+of the corners, which we then use to create the four boundaries.
+We enumerate the boundaries, starting with the left hand boundary as boundary zero
+and
+traversing clockwise. These boundaries are represented as `TriangleMeshPolyLines`,
+and stored in Vector of `TriangleMeshCurveSection` pointers.
+
+Using the `TriangleMeshCurve`, a new `TriangleMeshParameters` object is created,
+which is necessary in order to build a `TriangleMesh`.
+
+\dontinclude rectangular_sheet_kirchhoff_plate_bending_rotation_demo.cc
+\skipline /// Set-up the rectangular
+\until } // end of set_up_rectangular_mesh 
+
+After a call to the helper `set_up_rectangular_mesh`, which performs the
+assignment of the `Triangle_mesh_paramaters_pt`, we may construct the mesh from
+the initialised `Triangle_mesh_parameters_pt member`.
+
+\dontinclude rectangular_sheet_kirchhoff_plate_bending_rotation_demo.cc
+\skipline /// Constructor for the FvK
+\until Bulk_mesh_pt = new
+
+We then add the Bulk_mesh_pt as a sub_mesh of the problem, using the problem class
+member function
+`add_sub_mesh`. Since we have no need for any other meshes in this problem, we may
+now build the global mesh. 
+
+Next we call `complete_problem_set_up` to set element
+parameters and apply boundaries conditions. Once this is complete we will be able
+to assign equation numbers, which is the final step in the construction of the problem.
+
+\dontinclude rectangular_sheet_kirchhoff_plate_bending_rotation_demo.cc
+\skipline // Add the sub meshes
+\until end_constructor
+
+\section params Completing the Problem Set-up
+To finish the set-up of the problem, element parameters and boundary
+conditions must be set. In this problem, we may set the Poisson
+ratio and the pressure in the bulk. To do this we loop over all elements in the bulk
+mesh and recast the elements as the templated `ELEMENT` type. This allows
+us to <a href=https://en.wikipedia.org/wiki/Duck_typing>"duck type"</a> and call an element with helper functions `nu_pt()` and
+`pressure_fct_pt()` in order to set the physical parameters for
+the `KirchhoffPlateBendingC1CurvedBellElement`. Once these parameters are set,
+we may set the boundary conditions by calling the helper `apply_boundary_conditions()`.
+
+\dontinclude rectangular_sheet_kirchhoff_plate_bending_rotation_demo.cc
+\skipline start_of_complete
+\until end_of_complete
+
+\section bcs Setting Hermite Boundary Conditions
+To apply the boundary conditions, we loop over the boundaries of the sheet.
+We then loop over each boundary node lying on the ith boundary.
+
+For each node we first check if it is on a pinned boundary, using the helper function
+defined in the `TestSoln` namespace. If so, we pin the zeroth derivative, first tangential
+derivative and second tangential derivative degrees of freedom to zero.
+We do this because the function along the edge of each Bell element corresponds to a fifth order 1D polynomial:
+thus to constrain the whole side of the element to zero, all of the 1D polynomial
+degrees of freedom must be fixed to zero: i.e. the tangent derivatives and value
+degrees of freedom.
+
+Because we have rotated the degrees of freedom to the normal and tangent basis, we always pin the zeroth, first and fifth
+degress of freedom for pinned boundaries, which correspond to the value, tangent derivative and second tangent derivative, respectively.
+
+For the Bell element, the normal derivative along each edge of the element is a third-order polynomial.
+For slope-constrained boundaries, we may set the normal derivative and
+the cross derivative at the nodes, in order to prescribe the angle along the whole edge.
+Thus, for angle-constrained boundaries, we pin the second and fourth degrees of freedom, which correspond to the normal and cross-derivative respectively.
+The third degree of freedom, corresponding to the second normal derivative, is never
+known a priori and is never pinned to set the boundary conditions.
+
+\dontinclude rectangular_sheet_kirchhoff_plate_bending_rotation_demo.cc
+\skipline start_of_apply_bc
+\until end set bc
+<HR>
+<HR>
+
+\section complete Completing the Construction
+Now that the boundary conditions have been set in the helper function,
+`complete_problem_setup`, the final step to complete the
+construction of the problem is to set up the global equation numbering.
+This is performed by the inherited helper function `assign_equation_numbers`,
+which is called as the last step in the constructor.
+
+\dontinclude rectangular_sheet_kirchhoff_plate_bending_rotation_demo.cc
+\skipline // Complete the problem setup
+\until // end_constructor
+
+Now that the complete physical problem can be constructed, we may Newton solve
+the problem to determine the displacement of the rectangular plate, subject to a
+uniform pressure and the applied boundary conditions.
+
+\section exercises Exercises
+-# Try changing the number of plot points to 50. Why does the solution appear to improve?
+-# Try imposing boundary conditions such that the solution \f$w = x_1^2 x_2^2 \f$ holds throughout the domain. What pressure is needed to impose this manufactured solution?
+<HR>
+<HR>
+
+
+\section sources Source Files for this Tutorial
+- The source files for this tutorial are located in the directory:
+<CENTER>
+<A HREF="../../../../user_drivers/probable-giggle/">
+user_drivers/probable-giggle/
+</A>
+</CENTER>
+- The driver code is: 
+<CENTER>
+<A HREF=" ../../../../user_drivers/probable-giggle/rectangular_sheet_kirchhoff_plate_bending_rotation_demo.cc">
+user_drivers/probable-giggle/rectangular_sheet_kirchhoff_plate_bending_rotation_demo.cc
+</A>
+</CENTER>
+.
