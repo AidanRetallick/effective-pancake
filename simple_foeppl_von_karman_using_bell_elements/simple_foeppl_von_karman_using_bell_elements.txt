@@ -1,0 +1,181 @@
+\mainpage Demo Problem: Inflating a square Foeppl-von-Karman Plate using C1 Triangular Elements
+
+<p>
+In this example we demonstrate the use of <var>C<sup>1</sup></var> triangular
+(Bell) elements, in the simulation of an inflated, square plate.
+</p>
+<p>
+The Foeppl-von Karman equations are used to model a
+sheet of elastic material whose thickness, \f$h^*\f$, is small compared to its
+in-plane characteristic length, \f$L^*\f$, (\f$h=h^*/L^*\ll1\f$).
+They are derived from the force balance equations by assuming that all strain
+and in plane rotation is small, but allowing out of rotation to be moderately
+large. 
+</p>
+
+
+<CENTER>
+<TABLE>
+<TR>
+<TD>
+<CENTER>
+<B>Clamped square Foeppl-von Karman plate problem</B>
+</CENTER> 
+In Cartesian coordinates, \f$x_i\f$, with the in-plane displacements
+\f$v_\alpha\f$, and out-of-plane displacement \f$w\f$, solve the equations
+\f[
+#\frac{\mbox{d}^4w}{\mbox{d}x_1^4} +
+#\frac{\mbox{d}^4w}{\mbox{d}x_1^2\mbox{d}x_2^2} + 
+#\frac{\mbox{d}^4w}{\mbox{d}x_2^4} +
+\nabla^4 w - \eta\frac{\mbox{d}}{\mbox{d}x_\alpha}\left(\mbox{S}_{\alpha\beta}
+\frac{\mbox{d}w}{\mbox{d}x_\beta}\right)  = \Delta P\,,
+ \ \ \ \ \ \ \ \ \ \ @E[1stFvK]@
+\f]
+\f[
+\frac{\mbox{d}}{\mbox{d}x_\alpha} \mbox{S}_{\alpha\beta} = 0
+ \ \ \ \ \ \ \ \ \ \ @E[2nfFvK]@
+\f]
+on the square \f$\Omega = [-\frac{1}{2},\frac{1}{2}]^2\f$,
+with clamped boundary conditions 
+\f[
+w=\frac{\mbox{d}w}{\mbox{d}x_\alpha}\hat{n}_\alpha=0 \ \mbox{\ \ \ and \ \ \ } \ \ v_\alpha=0\,, 
+\ \ \ \ \ \ \ \ \ \ @E[FvK_BC]@
+\f]
+on \f$\partial\Omega\f$. Here \f$ \mathbf{\hat{n}} \f$ is the outward  unit normal,
+<B>S</B> is the dimensionless plane stress tensor:
+\f[
+\mbox{S}_{11}=\frac{1}{1-\nu^2}\left[\frac{\partial v_1}{\partial x_1} +
+\frac{1}{2}\left(\frac{\partial w}{\partial x_1}\right)^2 + \nu\left(\frac{\partial v_2}{\partial x_2} +
+\frac{1}{2}\left(\frac{\partial w}{\partial x_2}\right)^2\right)\right],
+\ \ \ \ \ \ \ \ \ \ @E[Stress11]@
+\f]
+\f[
+\mbox{S}_{22}=\frac{1}{1-\nu^2}\left[\frac{\partial v_2}{\partial x_2} +
+\frac{1}{2}\left(\frac{\partial w}{\partial x_2}\right)^2 + \nu\left(\frac{\partial v_1}{\partial x_1} +
+\frac{1}{2}\left(\frac{\partial w}{\partial x_1}\right)^2\right)\right],
+\ \ \ \ \ \ \ \ \ \ @E[Stress22]@
+\f]
+\f[
+\mbox{S}_{12}=\frac{1}{1+\nu}\left[\frac{1}{2}\left(\frac{\partial v_1}{\partial x_2} +
+\frac{\partial v_2}{\partial x_1}\right) 
+\frac{1}{2} \frac{\partial w}{\partial x_1} \frac{\partial w}{\partial x_2}\right].
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ @E[Stress12]@
+\f]
+</TD>
+</TR>
+</TABLE>  
+</CENTER>
+
+
+
+<p>
+We solve the problem using \c FoepplVonKarmanC1CurvedBellElement<NNODE_1D> which
+are high order, mixed interpolation, Foeppl-von Karman plate elements. Note:
+when initialised, these elements are simple triangular elements, but can be
+upgraded to elements with single curved edges and rotatable degrees of freedom
+for better representation of curved and non-orthogonal boundaries -- this will
+not be needed for our problem.
+</p>
+
+<p>
+Each element consists of a Hermite-type Bell basis for interpolation of the
+out-of-plane displacement \f$ w \f$ and a Lagrange-type basis (degree \f$
+\texttt{NNODE\_1D} - 1 \f$) which is used to interpolate the in-plane
+displacements \f$ v_\alpha \f$. This means there are 8 degrees of freedom (dofs)
+at vertex nodes: 2 Lagrangian, in-plane dofs and 6 Hermite out-of-plane dofs,
+and at non-vertex nodes (which exist if \f$\texttt{NNODE\_1D}>2\f$) there are
+simply 2 in-plane dofs.
+
+# EXPLAIN THE DISCRETIZATION HERE MATHEMATICALLY
+
+The basic construction is much the same as the usual order of actions in a 
+problem. 
+1.  Set up mesh parameters and build the mesh.
+2.  Complete problem setup and set boundary conditions.
+</p>
+
+This can be seen below in the constructor of the problem.
+\dontinclude .cc
+\skipline /// Constructor definition
+\until // end Constructor
+
+\section meshsetup Setup and Build the Mesh
+In this problem, the circular mesh is set up by specifying two semi-circular arcs
+as the input to the inline \c triangle mesh generator. This procedure follows the
+method outlined in the Triangle mesh generation tutorial so we do not discuss
+mesh construction further.
+
+\dontinclude circular_disc_uniform_pressure_foeppl_von_karman_demo.cc
+\skipline /// Set up and build the mesh
+\until // end build_mesh
+
+After the mesh is built, but before boundary conditions are set, elements on a
+lying on a boundary
+need to be upgraded to conform to the boundary, which we discuss in the next section. 
+This is a necessity in plate problems, where sufficiently continuous boundary interpolation 
+is necessary to ensure convergence to the solution of the physical problem
+
+
+\section bcs Setting Hermite Boundary Conditions in Mixed Interpolation Elements
+Once the Hermite degrees of freedom have been appropriately rotated, boundary 
+conditions can be set. In Foeppl-von Karman elements, both Lagrange and Hermite
+interpolation is used, which complicates the setting of boundary conditions.
+
+To assist in setting the boundary conditions, helper functions are provided:
+\c fix_out_of_plane_displacement_dof and \c fix_in_plane_displacement_dof.
+In this example, only out of plane displacement degrees of freedom are set,
+as the in-plane boundary conditions are stress free.
+
+As outlined in the previous section, there are six out-of-plane 
+degrees of freedom to set on each vertex node within an element. To pin an
+element along an entire edge the unknown, tangential derivative of the unknown
+and second tangential derivative must be set at both nodes lying on the boundary.
+To set the normal derivative of the unknown along an edge the normal derivative
+and cross derivative must be set. Thus for "smoothly clamped" boundary conditions
+all degrees of freedom, save for the second normal derivative, must be set to zero along
+the whole edge.
+
+For each boundary element we recast to a \c FoepplVonKarmanC1CurvedBellElement
+to access the helper function. The 5 degrees of freedom that need pinning are then looped over and
+passed to the helper function, along with a pointer to a function pointer that 
+returns the known value of the solution on the boundary, and its derivatives: 
+in this case a function that returns zero initialised vector.
+
+Finally, due to the stress free boundary condition, it is necessary to set the in-plane
+displacements at a single point in the domain, for which we choose to pin the centre.
+This is performed by the helper function \c pin_in_plane_displacements_at_centre_node()
+which locates the centre node and pins the in-plane displacements. This function
+makes use of the fact that the in-plane degrees of freedom are always stored \a before
+the out-of-plane degrees of freedom.
+
+\section aftersetup Solving the Problem
+The remaining procedure for determining the solution follows the generic method for solving problems in \c oomph-lib
+and has no additional complications. Thus we do not detail the rest of the procedure
+here. 
+
+<HR>
+<HR>
+
+\section exercises Exercises
+-# Try changing the number of plot points to 50. Why does the solution appear to improve?
+-# Try changing the boundary conditions to fix the two in-plane displacements. 
+Why shouldn't the displacements at the centre be pinned in this case?
+
+<HR>
+<HR>
+
+
+\section sources Source Files for this Tutorial
+- The source files for this tutorial are located in the directory:
+<CENTER>
+<A HREF="../../../../user_drivers/animated-octo-fiesta/">
+user_drivers/animated-octo-fiesta/
+</A>
+</CENTER>
+- The driver code is: 
+<CENTER>
+<A HREF="../../../../user_drivers/animated-octo-fiesta/circular_disc_uniform_pressure_foeppl_von_karman_demo.cc">
+user_drivers/animated-octo-fiesta/circular_disc_uniform_pressure_foeppl_von_karman_demo.cc
+</A>
+</CENTER>
+.
